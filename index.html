@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI ইন্টারভিউ প্র্যাকটিস</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f9f8f5;
+      --card: #ffffff;
+      --border: rgba(0,0,0,0.12);
+      --border-hover: rgba(0,0,0,0.25);
+      --text: #1a1a1a;
+      --muted: #666;
+      --hint: #999;
+      --surface: #f2f1ee;
+      --accent: #2563eb;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111110;
+        --card: #1c1c1a;
+        --border: rgba(255,255,255,0.1);
+        --border-hover: rgba(255,255,255,0.22);
+        --text: #f0ede8;
+        --muted: #a0a09a;
+        --hint: #666;
+        --surface: #242422;
+        --accent: #4a8cff;
+      }
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      line-height: 1.6;
+    }
+
+    .wrap {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* ── Header ── */
+    .site-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 2.5rem;
+    }
+    .logo {
+      width: 40px; height: 40px;
+      background: var(--accent);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .site-header h1 { font-size: 20px; font-weight: 600; }
+    .site-header p { font-size: 13px; color: var(--muted); }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    /* ── Form ── */
+    label { font-size: 13px; color: var(--muted); display: block; margin-bottom: 5px; }
+    input[type=text], select, textarea {
+      width: 100%;
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      padding: 9px 12px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    input[type=text]:focus, select:focus, textarea:focus {
+      border-color: var(--border-hover);
+    }
+    textarea { min-height: 130px; resize: vertical; line-height: 1.6; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+
+    /* ── Buttons ── */
+    .btn {
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: inherit;
+      background: var(--card);
+      border: 0.5px solid var(--border-hover);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .btn:hover { background: var(--surface); }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .btn-full { width: 100%; margin-top: 1rem; }
+    .btn-row { display: flex; gap: 10px; margin-top: 1rem; }
+    .btn-row .btn { flex: 1; }
+
+    /* ── Progress ── */
+    .progress-wrap { margin-bottom: 1.5rem; }
+    .progress-bar {
+      height: 4px;
+      background: var(--surface);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      transition: width 0.4s ease;
+    }
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .badge {
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 99px;
+      background: var(--surface);
+      color: var(--muted);
+      border: 0.5px solid var(--border);
+    }
+
+    /* ── Interviewer ── */
+    .interviewer-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .iv-name { font-size: 14px; font-weight: 500; }
+    .iv-role { font-size: 12px; color: var(--muted); }
+    .question-text { font-size: 15px; line-height: 1.7; min-height: 48px; }
+
+    /* ── Loading dots ── */
+    .dots span { animation: blink 1.2s infinite; }
+    .dots span:nth-child(2) { animation-delay: 0.2s; }
+    .dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes blink { 0%,80%,100%{opacity:0} 40%{opacity:1} }
+
+    /* ── Feedback ── */
+    .feedback-card {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    .score-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .pill {
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 99px;
+      border: 0.5px solid;
+    }
+    .pill-good { background: #EAF3DE; color: #3B6D11; border-color: #C0DD97; }
+    .pill-ok   { background: #FAEEDA; color: #854F0B; border-color: #FAC775; }
+    .pill-bad  { background: #FCEBEB; color: #A32D2D; border-color: #F7C1C1; }
+    .feedback-label { font-size: 12px; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
+    .feedback-body { font-size: 14px; line-height: 1.7; }
+
+    /* ── Result screen ── */
+    .result-screen { display: none; }
+    .result-hero { text-align: center; padding: 2rem 0; }
+    .big-score { font-size: 56px; font-weight: 600; color: var(--text); }
+    .score-sub { font-size: 14px; color: var(--muted); margin-bottom: 1.5rem; }
+    .breakdown-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 0.5px solid var(--border);
+      font-size: 14px;
+      gap: 12px;
+    }
+    .breakdown-item .q-snippet { color: var(--muted); font-size: 13px; flex: 1; }
+    .breakdown-item .q-score { font-weight: 500; white-space: nowrap; }
+
+    /* ── Screens ── */
+    #setup-screen { }
+    #interview-screen { display: none; }
+
+    /* ── Footer ── */
+    .footer { text-align: center; margin-top: 2.5rem; font-size: 12px; color: var(--hint); }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Header -->
+  <div class="site-header">
+    <div class="logo">🎯</div>
+    <div>
+      <h1>AI ইন্টারভিউ প্র্যাকটিস</h1>
+      <p>AI ইন্টারভিউয়ারের সাথে প্র্যাকটিস করুন, রিয়েল ফিডব্যাক পান</p>
+    </div>
+  </div>
+
+  <!-- ══ SETUP SCREEN ══ -->
+  <div id="setup-screen">
+    <div class="card">
+      <label>আপনার পেশা / ক্যারিয়ার গোল</label>
+      <input type="text" id="role-input" placeholder="যেমন: Web Developer, Marketing Manager, Data Analyst..." />
+      <div class="grid2">
+        <div>
+          <label>অভিজ্ঞতার স্তর</label>
+          <select id="level-select">
+            <option value="fresher">ফ্রেশার (০ বছর)</option>
+            <option value="junior">জুনিয়র (১–২ বছর)</option>
+            <option value="mid">মিড-লেভেল (৩–৫ বছর)</option>
+            <option value="senior">সিনিয়র (৫+ বছর)</option>
+          </select>
+        </div>
+        <div>
+          <label>ইন্টারভিউ ধরন</label>
+          <select id="type-select">
+            <option value="behavioral">বিহেভিয়ারাল</option>
+            <option value="technical">টেকনিক্যাল</option>
+            <option value="hr">HR রাউন্ড</option>
+            <option value="mixed">মিশ্র</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-full" onclick="startInterview()">ইন্টারভিউ শুরু করুন →</button>
+  </div>
+
+  <!-- ══ INTERVIEW SCREEN ══ -->
+  <div id="interview-screen">
+    <div class="progress-wrap">
+      <div class="meta-row">
+        <span class="badge" id="q-counter">প্রশ্ন ১ / ৫</span>
+        <span class="badge" id="type-badge">বিহেভিয়ারাল</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- Question Card -->
+    <div class="card">
+      <div class="interviewer-row">
+        <div class="avatar">👤</div>
+        <div>
+          <div class="iv-name">Sarah Ahmed</div>
+          <div class="iv-role">HR Manager</div>
+        </div>
+      </div>
+      <div class="question-text" id="question-text">
+        <span class="dots"><span>.</span><span>.</span><span>.</span></span>
+      </div>
+    </div>
+
+    <!-- Answer -->
+    <textarea id="answer-input" placeholder="এখানে আপনার উত্তর লিখুন... (বাংলা বা ইংরেজি যেকোনো ভাষায়)"></textarea>
+
+    <!-- Feedback -->
+    <div class="feedback-card" id="feedback-card">
+      <div class="score-pills" id="score-pills"></div>
+      <div class="feedback-label">ফিডব্যাক</div>
+      <div class="feedback-body" id="feedback-body"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" id="submit-btn" onclick="submitAnswer()">উত্তর জমা দিন</button>
+      <button class="btn" id="next-btn" onclick="nextQuestion()" style="display:none">পরের প্রশ্ন →</button>
+    </div>
+  </div>
+
+  <!-- ══ RESULT SCREEN ══ -->
+  <div class="result-screen" id="result-screen">
+    <div class="result-hero">
+      <div class="big-score" id="final-score">—</div>
+      <div class="score-sub" id="score-sub">ইন্টারভিউ সম্পন্ন হয়েছে</div>
+    </div>
+    <div class="card" id="breakdown-card"></div>
+    <button class="btn btn-full" onclick="restartInterview()">আবার চেষ্টা করুন</button>
+  </div>
+
+  <div class="footer">Powered by Claude AI &nbsp;·&nbsp; সম্পূর্ণ বিনামূল্যে</div>
+</div>
+
+<script>
+  // ── Config ──────────────────────────────────────────────────
+  const TOTAL_Q = 5;
+
+  // ── State ────────────────────────────────────────────────────
+  let currentQ = 0, questions = [], scores = [];
+  let userRole = '', userLevel = '', userType = '';
+
+  // ── API Call (Vercel proxy — CORS নেই) ──────────────────────
+  async function askAI(prompt) {
+    const res = await fetch('/api/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+    const data = await res.json();
+    if (!data.text) throw new Error(data.error || 'No response');
+    return data.text;
+  }
+
+  // ── Start ────────────────────────────────────────────────────
+  async function startInterview() {
+    userRole  = document.getElementById('role-input').value.trim() || 'General Position';
+    userLevel = document.getElementById('level-select').value;
+    userType  = document.getElementById('type-select').value;
+    const labels = { behavioral:'বিহেভিয়ারাল', technical:'টেকনিক্যাল', hr:'HR রাউন্ড', mixed:'মিশ্র' };
+    document.getElementById('type-badge').textContent = labels[userType];
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('interview-screen').style.display = 'block';
+    await loadQuestion();
+  }
+
+  // ── Load Question ────────────────────────────────────────────
+  async function loadQuestion() {
+    currentQ++;
+    document.getElementById('q-counter').textContent = `প্রশ্ন ${currentQ} / ${TOTAL_Q}`;
+    document.getElementById('progress-fill').style.width = `${((currentQ-1)/TOTAL_Q)*100}%`;
+    document.getElementById('question-text').innerHTML = '<span class="dots"><span>.</span><span>.</span><span>.</span></span>';
+    document.getElementById('answer-input').value = '';
+    document.getElementById('feedback-card').style.display = 'none';
+    document.getElementById('submit-btn').style.display = '';
+    document.getElementById('submit-btn').disabled = false;
+    document.getElementById('submit-btn').textContent = 'উত্তর জমা দিন';
+    document.getElementById('next-btn').style.display = 'none';
+
+    const prev = questions.map((q,i) => `Q${i+1}: ${q}`).join('\n');
+    const prompt = `Generate interview question #${currentQ} of ${TOTAL_Q} for:
+Role: ${userRole}
+Level: ${userLevel}
+Type: ${userType}
+${prev ? 'Previous questions (do not repeat):\n' + prev : ''}
+Return ONLY the question text. Mix Bengali and English naturally.`;
+
+    try {
+      const q = await askAI(prompt);
+      questions.push(q.trim());
+      document.getElementById('question-text').textContent = q.trim();
+    } catch(e) {
+      document.getElementById('question-text').textContent = 'প্রশ্ন লোড করতে সমস্যা হয়েছে। পেজ রিলোড করুন।';
+    }
+  }
+
+  // ── Submit Answer ────────────────────────────────────────────
+  async function submitAnswer() {
+    const answer = document.getElementById('answer-input').value.trim();
+    if (!answer) {
+      document.getElementById('answer-input').style.borderColor = '#E24B4A';
+      setTimeout(() => document.getElementById('answer-input').style.borderColor = '', 1200);
+      return;
+    }
+    document.getElementById('submit-btn').disabled = true;
+    document.getElementById('submit-btn').textContent = 'মূল্যায়ন হচ্ছে...';
+    document.getElementById('feedback-card').style.display = 'block';
+    document.getElementById('feedback-body').innerHTML = '<span class="dots"><span>.</span><span>.</span><span>.</span></span>';
+    document.getElementById('score-pills').innerHTML = '';
+
+    const prompt = `Interview context:
+Role: ${userRole}, Level: ${userLevel}, Type: ${userType}
+Question: ${questions[currentQ-1]}
+Candidate answer: ${answer}
+
+Evaluate and return ONLY valid JSON (no markdown):
+{"score":8,"clarity":"ভালো","relevance":"মোটামুটি","confidence":"ভালো","feedback":"2-3 sentences of constructive feedback in Bengali","tip":"one specific improvement tip in Bengali"}
+
+clarity/relevance/confidence values must be one of: "ভালো", "মোটামুটি", "দুর্বল"`;
+
+    try {
+      const raw = await askAI(prompt);
+      const clean = raw.replace(/```json|```/g,'').trim();
+      const r = JSON.parse(clean);
+      scores.push(r.score || 5);
+      const cls = v => v==='ভালো' ? 'pill-good' : v==='মোটামুটি' ? 'pill-ok' : 'pill-bad';
+      document.getElementById('score-pills').innerHTML = `
+        <span class="pill ${cls(r.clarity)}">স্পষ্টতা: ${r.clarity}</span>
+        <span class="pill ${cls(r.relevance)}">প্রাসঙ্গিকতা: ${r.relevance}</span>
+        <span class="pill ${cls(r.confidence)}">আত্মবিশ্বাস: ${r.confidence}</span>
+        <span class="pill pill-ok">স্কোর: ${r.score}/10</span>`;
+      document.getElementById('feedback-body').textContent =
+        r.feedback + (r.tip ? ' 💡 ' + r.tip : '');
+    } catch(e) {
+      document.getElementById('feedback-body').textContent = 'ফিডব্যাক লোড করতে সমস্যা হয়েছে।';
+    }
+    document.getElementById('submit-btn').style.display = 'none';
+    document.getElementById('next-btn').style.display = '';
+    document.getElementById('next-btn').textContent =
+      currentQ < TOTAL_Q ? 'পরের প্রশ্ন →' : 'ফলাফল দেখুন →';
+  }
+
+  // ── Next / Result ─────────────────────────────────────────────
+  function nextQuestion() {
+    if (currentQ >= TOTAL_Q) { showResult(); return; }
+    loadQuestion();
+  }
+
+  function showResult() {
+    document.getElementById('interview-screen').style.display = 'none';
+    document.getElementById('result-screen').style.display = 'block';
+    const avg = scores.length
+      ? (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1) : '—';
+    document.getElementById('final-score').textContent = `${avg}/10`;
+    document.getElementById('score-sub').textContent =
+      avg >= 7 ? '🎉 চমৎকার পারফরম্যান্স!' :
+      avg >= 5 ? '👍 মোটামুটি ভালো, আরো প্র্যাকটিস করুন' :
+                 '💪 আরো প্র্যাকটিস দরকার';
+    const rows = questions.map((q,i) => `
+      <div class="breakdown-item">
+        <span class="q-snippet">${q.substring(0,65)}...</span>
+        <span class="q-score">${scores[i]||'?'}/10</span>
+      </div>`).join('');
+    document.getElementById('breakdown-card').innerHTML = rows;
+  }
+
+  function restartInterview() {
+    currentQ = 0; questions = []; scores = [];
+    document.getElementById('result-screen').style.display = 'none';
+    document.getElementById('setup-screen').style.display = 'block';
+  }
+</script>
+</body>
+</html>
